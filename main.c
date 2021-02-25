@@ -9,20 +9,17 @@ enum TypesOfFigures { UNKNOWN, CIRCLE, TRIANGLE };
 
 enum ErrorStatus { NOTFOUND = 0, FOUND = -1 };
 
-void skip_space(char** cursor_start, char** cursor_end)
+void skip_space(char** cursor_start)
 {
     while (**cursor_start == ' ') {
         (*cursor_start)++;
-        (*cursor_end)++;
     }
 }
 
-void check_punctuation_symbols(
-        char** cursor_start, char** cursor_end, int* error, char symbol)
+void check_punctuation_symbols(char** cursor_start, int* error, char symbol)
 {
     if (**cursor_start == symbol) {
         (*cursor_start)++;
-        (*cursor_end)++;
     } else {
         printf("Error: expected \"%c\"\n\n", symbol);
         *error = FOUND;
@@ -40,6 +37,17 @@ void check_extra_token(char** cursor_start, int* error)
             *error = FOUND;
         } else {
             (*cursor_start)++;
+        }
+    }
+}
+
+void select_type(char** cursor_start, char** cursor_end, char* input)
+{
+    if (isalpha(**cursor_start) != 0) {
+        *cursor_end = *cursor_start;
+        while ((isalpha(**cursor_end) != 0)
+               && (*cursor_end != input + strlen(input))) {
+            (*cursor_end)++;
         }
     }
 }
@@ -70,8 +78,8 @@ int main()
     float x1, y1 = 0;
     float radius1 = 0;
     char input[70];
-    char* cursor_start = input;
-    char* cursor_end = input;
+    char* cursor_start;
+    char* cursor_end;
     size_t length_of_type = 0;
     char type_circle[] = {"circle"};
     char type_triangle[] = {"triangle"};
@@ -87,23 +95,12 @@ int main()
         figure = UNKNOWN;
         error = NOTFOUND;
         fputs(input, stdout); // если надо вывести введенные данные
-
-        // ставим указатели на начало ввода
         cursor_start = input;
         cursor_end = input;
-        skip_space(&cursor_start, &cursor_end);
+        skip_space(&cursor_start);
 
-        //если встречается буква, то двигаем второй указатель пока не встретит
-        //другой символ
-        if (isalpha(*cursor_start) != 0) {
-            while ((isalpha(*cursor_end) != 0)
-                   && (cursor_end != input + strlen(input))) {
-                cursor_end++;
-            }
-        }
-
+        select_type(&cursor_start, &cursor_end, input);
         length_of_type = cursor_end - cursor_start;
-
         figure = determine_figure(
                 &cursor_start,
                 &error,
@@ -114,18 +111,17 @@ int main()
             continue;
         }
 
-        //присваиваем первому курсору положение второго курсора
         cursor_start = cursor_end;
-        skip_space(&cursor_start, &cursor_end);
-        check_punctuation_symbols(&cursor_start, &cursor_end, &error, '(');
+        skip_space(&cursor_start);
+        check_punctuation_symbols(&cursor_start, &error, '(');
         if (figure == TRIANGLE && error == NOTFOUND) {
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, '(');
+            check_punctuation_symbols(&cursor_start, &error, '(');
         }
         if (error == FOUND) {
             continue;
         }
-        skip_space(&cursor_start, &cursor_end);
 
+        cursor_end = cursor_start;
         switch (figure) {
         case CIRCLE:
             x1 = strtof(cursor_start, &cursor_end);
@@ -134,27 +130,25 @@ int main()
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
             y1 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float y1\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            skip_space(&cursor_start);
+            check_punctuation_symbols(&cursor_start, &error, ',');
             if (error == FOUND) {
                 continue;
             }
-            skip_space(&cursor_start, &cursor_end);
             radius1 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float radius\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ')');
+            skip_space(&cursor_start);
+            check_punctuation_symbols(&cursor_start, &error, ')');
             if (error == FOUND) {
                 continue;
             }
@@ -183,76 +177,72 @@ int main()
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
             y1 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float y1\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            skip_space(&cursor_start);
+            check_punctuation_symbols(&cursor_start, &error, ',');
             if (error == FOUND) {
                 continue;
             }
-            skip_space(&cursor_start, &cursor_end);
+
             x2 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float x2\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
             y2 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float y2\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            skip_space(&cursor_start);
+            check_punctuation_symbols(&cursor_start, &error, ',');
             if (error == FOUND) {
                 continue;
             }
-            skip_space(&cursor_start, &cursor_end);
+
             x3 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float x3\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
             y3 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float y3\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            skip_space(&cursor_start);
+            check_punctuation_symbols(&cursor_start, &error, ',');
             if (error == FOUND) {
                 continue;
             }
-            skip_space(&cursor_start, &cursor_end);
+
             x4 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float x4\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
             y4 = strtof(cursor_start, &cursor_end);
             if (cursor_start == cursor_end) {
                 printf("Error: expected float y4\n\n");
                 continue;
             }
             cursor_start = cursor_end;
-            skip_space(&cursor_start, &cursor_end);
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ')');
+            skip_space(&cursor_start);
+            check_punctuation_symbols(&cursor_start, &error, ')');
             if (error == FOUND) {
                 continue;
             }
-            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ')');
+            check_punctuation_symbols(&cursor_start, &error, ')');
             if (error == FOUND) {
                 continue;
             }

@@ -17,35 +17,14 @@ void skip_space(char** cursor_start, char** cursor_end)
     }
 }
 
-void check_comma(char** cursor_start, char** cursor_end, int* error)
+void check_punctuation_symbols(
+        char** cursor_start, char** cursor_end, int* error, char symbol)
 {
-    if (**cursor_start == ',') {
+    if (**cursor_start == symbol) {
         (*cursor_start)++;
         (*cursor_end)++;
     } else {
-        printf("Error: expected \",\"\n\n");
-        *error = FOUND;
-    }
-}
-
-void check_bracket_left(char** cursor_start, char** cursor_end, int* error)
-{
-    if (**cursor_start == '(') {
-        (*cursor_start)++;
-        (*cursor_end)++;
-    } else {
-        printf("Error: expected \"(\"\n\n");
-        *error = FOUND;
-    }
-}
-
-void check_bracket_right(char** cursor_start, char** cursor_end, int* error)
-{
-    if (**cursor_start == ')') {
-        (*cursor_start)++;
-        (*cursor_end)++;
-    } else {
-        printf("Error: expected \")\"\n\n");
+        printf("Error: expected \"%c\"\n\n", symbol);
         *error = FOUND;
     }
 }
@@ -65,6 +44,27 @@ void check_extra_token(char** cursor_start, int* error)
     }
 }
 
+int determine_figure(
+        char** cursor_start,
+        int* error,
+        size_t length_of_type,
+        char* type_circle,
+        char* type_triangle)
+{
+    if (strncasecmp(*cursor_start, type_circle, LENGTH_OF_CIRCLE) == 0
+        && length_of_type == LENGTH_OF_CIRCLE) {
+        return CIRCLE;
+    } else if (
+            strncasecmp(*cursor_start, type_triangle, LENGTH_OF_TRIANGLE) == 0
+            && length_of_type == LENGTH_OF_TRIANGLE) {
+        return TRIANGLE;
+    } else {
+        printf("Error: expected \"circle\" | \"triangle\"\n\n");
+        *error = FOUND;
+        return UNKNOWN;
+    }
+}
+
 int main()
 {
     float x1, y1 = 0;
@@ -80,6 +80,7 @@ int main()
     int counter = 0;
     //для кейса треугольника:
     float x2, y2, x3, y3, x4, y4 = 0;
+    // char symbol;
 
     printf("Напишите то, что хотите проанализировать:\n");
     while ((fgets(input, 70, stdin))) {
@@ -101,30 +102,24 @@ int main()
             }
         }
 
-        //посчитаем длину введенного типа фигуры
         length_of_type = cursor_end - cursor_start;
-        //Если введенный тип совпал с известными нам типами фигур, то печатаем
-        //тип и выставляем переменной figure соответствующее значение, иначе -
-        //вывести ошибку
-        if ((strncasecmp(cursor_start, type_circle, LENGTH_OF_CIRCLE) == 0)
-            && (length_of_type == LENGTH_OF_CIRCLE)) {
-            figure = CIRCLE;
-        } else if (
-                (strncasecmp(cursor_start, type_triangle, LENGTH_OF_TRIANGLE)
-                 == 0)
-                && (length_of_type == LENGTH_OF_TRIANGLE)) {
-            figure = TRIANGLE;
-        } else {
-            printf("Error: expected \"circle\" | \"triangle\"\n\n");
+
+        figure = determine_figure(
+                &cursor_start,
+                &error,
+                length_of_type,
+                type_circle,
+                type_triangle);
+        if (error == FOUND) {
             continue;
         }
 
         //присваиваем первому курсору положение второго курсора
         cursor_start = cursor_end;
         skip_space(&cursor_start, &cursor_end);
-        check_bracket_left(&cursor_start, &cursor_end, &error);
-        if ((figure == TRIANGLE) && (error == 0)) {
-            check_bracket_left(&cursor_start, &cursor_end, &error);
+        check_punctuation_symbols(&cursor_start, &cursor_end, &error, '(');
+        if (figure == TRIANGLE && error == NOTFOUND) {
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, '(');
         }
         if (error == FOUND) {
             continue;
@@ -132,158 +127,157 @@ int main()
         skip_space(&cursor_start, &cursor_end);
 
         switch (figure) {
-            case CIRCLE:
-                x1 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float x1\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                y1 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float y1\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                check_comma(&cursor_start, &cursor_end, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                skip_space(&cursor_start, &cursor_end);
-                radius1 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float radius\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                check_bracket_right(&cursor_start, &cursor_end, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                check_extra_token(&cursor_start, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                //передать данные о переменных,
-                //типе фигуры, номере в массив
-                //считаем номер фигуры
-                counter++;
-                printf("%d Тип фигуры: circle\n", counter);
-                printf("x1 = %.1lf y1 = "
-                       "%.1lf\nradius1 "
-                       "= "
-                       "%.1lf\n\n",
-                       x1,
-                       y1,
-                       radius1);
-                break;
+        case CIRCLE:
+            x1 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float x1\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            y1 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float y1\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            if (error == FOUND) {
+                continue;
+            }
+            skip_space(&cursor_start, &cursor_end);
+            radius1 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float radius\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ')');
+            if (error == FOUND) {
+                continue;
+            }
+            check_extra_token(&cursor_start, &error);
+            if (error == FOUND) {
+                continue;
+            }
+            //передать данные о переменных,
+            //типе фигуры, номере в массив
+            //считаем номер фигуры
+            counter++;
+            printf("%d Тип фигуры: circle\n", counter);
+            printf("x1 = %.1lf y1 = "
+                   "%.1lf\nradius1 "
+                   "= "
+                   "%.1lf\n\n",
+                   x1,
+                   y1,
+                   radius1);
+            break;
 
-            case TRIANGLE:
-                x1 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float x1\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                y1 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float y1\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                check_comma(&cursor_start, &cursor_end, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                skip_space(&cursor_start, &cursor_end);
-                x2 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float x2\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                y2 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float y2\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                check_comma(&cursor_start, &cursor_end, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                skip_space(&cursor_start, &cursor_end);
-                x3 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float x3\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                y3 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float y3\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                check_comma(&cursor_start, &cursor_end, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                skip_space(&cursor_start, &cursor_end);
-                x4 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float x4\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                y4 = strtof(cursor_start, &cursor_end);
-                if (cursor_start == cursor_end) {
-                    printf("Error: expected float y4\n\n");
-                    continue;
-                }
-                cursor_start = cursor_end;
-                skip_space(&cursor_start, &cursor_end);
-                check_bracket_right(&cursor_start, &cursor_end, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                check_bracket_right(&cursor_start, &cursor_end, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                check_extra_token(&cursor_start, &error);
-                if (error == FOUND) {
-                    continue;
-                }
-                //передать данные о переменных,
-                //типе фигуры, номере в массив
-                //посчитать номер фигуры, возможно потом не понадобиться тут,
-                //можно убрать (т.к. вывод будет после выполнения парсинга строки)
-                counter++;
-                printf("%d Тип фигуры: triangle\n", counter);
-                printf("x1 = %.1lf y1 = %.1lf\nx2 = %.1lf y2 = %.1lf\nx3 = %.1lf "
-                       "y3 = %.1lf\nx4 = %.1lf y4 = %.1lf\n\n",
-                       x1,
-                       y1,
-                       x2,
-                       y2,
-                       x3,
-                       y3,
-                       x4,
-                       y4);
-                break;
+        case TRIANGLE:
+            x1 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float x1\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            y1 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float y1\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            if (error == FOUND) {
+                continue;
+            }
+            skip_space(&cursor_start, &cursor_end);
+            x2 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float x2\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            y2 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float y2\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            if (error == FOUND) {
+                continue;
+            }
+            skip_space(&cursor_start, &cursor_end);
+            x3 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float x3\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            y3 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float y3\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ',');
+            if (error == FOUND) {
+                continue;
+            }
+            skip_space(&cursor_start, &cursor_end);
+            x4 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float x4\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            y4 = strtof(cursor_start, &cursor_end);
+            if (cursor_start == cursor_end) {
+                printf("Error: expected float y4\n\n");
+                continue;
+            }
+            cursor_start = cursor_end;
+            skip_space(&cursor_start, &cursor_end);
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ')');
+            if (error == FOUND) {
+                continue;
+            }
+            check_punctuation_symbols(&cursor_start, &cursor_end, &error, ')');
+            if (error == FOUND) {
+                continue;
+            }
+            check_extra_token(&cursor_start, &error);
+            if (error == FOUND) {
+                continue;
+            }
+            //передать данные о переменных,
+            //типе фигуры, номере в массив
+            //посчитать номер фигуры, возможно потом не понадобиться тут,
+            //можно убрать (т.к. вывод будет после выполнения парсинга строки)
+            counter++;
+            printf("%d Тип фигуры: triangle\n", counter);
+            printf("x1 = %.1lf y1 = %.1lf\nx2 = %.1lf y2 = %.1lf\nx3 = %.1lf "
+                   "y3 = %.1lf\nx4 = %.1lf y4 = %.1lf\n\n",
+                   x1,
+                   y1,
+                   x2,
+                   y2,
+                   x3,
+                   y3,
+                   x4,
+                   y4);
+            break;
         }
     }
     return 0;
 }
-

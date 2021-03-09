@@ -47,11 +47,10 @@ Bool check_extra_token(char** cursor_start)
 
 /*если встречается буква, то пока она встречается
 двигаем указатель end пока не увидим другой символ*/
-void select_type(char** cursor_start, char** cursor_end, char* input)
+void select_type(char** cursor_start, char** cursor_end)
 {
     *cursor_end = *cursor_start;
-    while ((isalpha(**cursor_end) != 0)
-           && (*cursor_end != input + strlen(input))) {
+    while (isalpha(**cursor_end) != 0) {
         (*cursor_end)++;
     }
 }
@@ -61,10 +60,12 @@ void select_type(char** cursor_start, char** cursor_end, char* input)
 вывести ошибку*/
 Type determine_figure(
         char** cursor_start,
-        size_t length_of_type,
+        char** cursor_end,
         char* type_circle,
         char* type_triangle)
 {
+    select_type(cursor_start, cursor_end);
+    size_t length_of_type = *cursor_end - *cursor_start;
     if (strncasecmp(*cursor_start, type_circle, LENGTH_OF_CIRCLE) == 0
         && length_of_type == LENGTH_OF_CIRCLE) {
         return CIRCLE;
@@ -125,7 +126,7 @@ int main()
     char input[70];
     char* cursor_start;
     char* cursor_end;
-    size_t length_of_type = 0;
+    // size_t length_of_type = 0;
     char type_circle[] = {"circle"};
     char type_triangle[] = {"triangle"};
     Type figure;
@@ -143,10 +144,8 @@ int main()
         cursor_end = input;
         skip_space(&cursor_start);
 
-        select_type(&cursor_start, &cursor_end, input);
-        length_of_type = cursor_end - cursor_start;
         figure = determine_figure(
-                &cursor_start, length_of_type, type_circle, type_triangle);
+                &cursor_start, &cursor_end, type_circle, type_triangle);
         if (figure == UNKNOWN) {
             continue;
         }

@@ -83,7 +83,8 @@ Bool parse_circle(char** cursor_start, char** cursor_end, int* counter)
 {
     Bool implementation2;
     float x1, y1, radius1;
-    x1 = strtof(*cursor_start, &(*cursor_end));
+
+    x1 = strtof(*cursor_start, cursor_end);
     if (*cursor_start == *cursor_end) {
         printf("Error: expected float x1\n\n");
         return FAILURE;
@@ -91,28 +92,28 @@ Bool parse_circle(char** cursor_start, char** cursor_end, int* counter)
     //убрать избыточные ветвления, создать функцию, которая возвращает нам тру
     //или фолс, и сразу писать ретёрн ()
     *cursor_start = *cursor_end;
-    y1 = strtof(*cursor_start, &(*cursor_end));
+    y1 = strtof(*cursor_start, cursor_end);
     if (*cursor_start == *cursor_end) {
         printf("Error: expected float y1\n\n");
         return FAILURE;
     }
     *cursor_start = *cursor_end;
-    skip_space(&(*cursor_start));
-    implementation2 = check_punctuation_symbols(&(*cursor_start), ',');
+    skip_space(cursor_start);
+    implementation2 = check_punctuation_symbols(cursor_start, ',');
     if (implementation2)
         return FAILURE;
 
-    radius1 = strtof(*cursor_start, &(*cursor_end));
+    radius1 = strtof(*cursor_start, cursor_end);
     if (*cursor_start == *cursor_end) {
         printf("Error: expected float radius\n\n");
         return FAILURE;
     }
     *cursor_start = *cursor_end;
-    skip_space(&(*cursor_start));
-    implementation2 = check_punctuation_symbols(&(*cursor_start), ')');
+    skip_space(cursor_start);
+    implementation2 = check_punctuation_symbols(cursor_start, ')');
     if (implementation2)
         return FAILURE;
-    implementation2 = check_extra_token(&(*cursor_start));
+    implementation2 = check_extra_token(cursor_start);
     if (implementation2)
         return FAILURE;
     (*counter)++;

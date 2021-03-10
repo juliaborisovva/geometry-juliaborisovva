@@ -81,7 +81,6 @@ Type determine_figure(char** cursor_start, char** cursor_end)
             && length_of_type == LENGTH_OF_TRIANGLE) {
         return TRIANGLE;
     } else {
-        printf("Error: expected \"circle\" | \"triangle\"\n\n");
         return UNKNOWN;
     }
 }
@@ -91,6 +90,10 @@ ErrStatus parse_circle(char** cursor_start, char** cursor_end, int* counter)
     ErrStatus implementation2;
     float x1, y1, radius1;
 
+    implementation2 = check_punctuation_symbols(cursor_start, '(');
+    if (implementation2)
+        return FAILURE;
+    *cursor_end = *cursor_start;
     x1 = strtof(*cursor_start, cursor_end);
     if (*cursor_start == *cursor_end) {
         printf("Error: expected float x1\n\n");
@@ -134,6 +137,15 @@ ErrStatus parse_triangle(char** cursor_start, char** cursor_end, int* counter)
     ErrStatus implementation2;
     float coords[8];
     int number = 0;
+
+    implementation2 = check_punctuation_symbols(cursor_start, '(');
+    if (implementation2)
+        return FAILURE;
+    implementation2 = check_punctuation_symbols(cursor_start, '(');
+    if (implementation2)
+        return FAILURE;
+    *cursor_end = *cursor_start;
+
     for (int i = 0; i < 8; i++) {
         coords[i] = strtof(*cursor_start, cursor_end);
         char letter = 'y';
@@ -185,30 +197,20 @@ int main()
     char* cursor_start;
     char* cursor_end;
     Type figure;
-    ErrStatus implementation;
     int counter = 0;
 
     printf("Напишите то, что хотите проанализировать:\n");
     while ((fgets(input, 70, stdin))) {
         figure = UNKNOWN;
-        implementation = SUCCESS;
         fputs(input, stdout); // если надо вывести введенные данные
         cursor_start = input;
         cursor_end = input;
+
         skip_space(&cursor_start);
-
         figure = determine_figure(&cursor_start, &cursor_end);
-        if (figure == UNKNOWN) {
-            continue;
-        }
-
         cursor_start = cursor_end;
         skip_space(&cursor_start);
-        implementation = check_left_brackets(figure, &cursor_start);
-        if (implementation)
-            continue;
 
-        cursor_end = cursor_start;
         switch (figure) {
         case CIRCLE:
             parse_circle(&cursor_start, &cursor_end, &counter);
@@ -217,6 +219,7 @@ int main()
             parse_triangle(&cursor_start, &cursor_end, &counter);
             break;
         case UNKNOWN:
+            printf("Error: expected \"circle\" | \"triangle\"\n\n");
             break;
         }
     }

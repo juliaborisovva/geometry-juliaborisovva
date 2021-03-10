@@ -1,0 +1,23 @@
+circle (45 38, 87)
+    circle  (  24  71 , 83 )  
+  circle  (67.3   56.8  ,  98.6  )   
+circlee
+triangle (
+triangle ((
+triangle
+circle
+circle(
+circle(45 36 78)
+circle(34 45, 67)
+circle(34 45, 67
+circle 56 78, 90)
+circle( 34 28, 65)    add  
+triangle (( 45 67, 71 95, 36 28, 39 20))
+triangle (( 45 67, 71 95, 36 28, 39 20))  kdf
+triangle (( 45 67, x71 95, 36 28, 39 20))
+triangle (( 45 67, 71 95, 36 28, 39 x20))
+triangle (( 45 67, 71 95, 36 x28, 39 20))
+triangle (( 45.4 67.7, 71.9 95.4, 36.3 28.2, 39.7 20.1))
+triangle (( 45 67, 71 95, 36 28, 39 20)
+7 triangle (( 45 67, 71 95, 36 28, 39 20))
+\triangle (( 45 67, 71 95, 36 28, 39 20))

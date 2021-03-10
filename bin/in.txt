@@ -1,0 +1,7 @@
+c
+l
+h
+circle( 45 67, 29)  
+g
+circle( 45 67, 29)  kkaka
+circlee

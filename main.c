@@ -16,7 +16,26 @@ void skip_space(char** cursor_start)
     }
 }
 
-// typedef struct
+typedef struct TriangleData {
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+    float x3;
+    float y3;
+    float x4;
+    float y4;
+    float perimeter;
+    float area;
+} Triangle;
+
+typedef struct CircleData {
+    float x1;
+    float y1;
+    float radius1;
+    float perimeter;
+    float area;
+} Circle;
 
 ErrStatus check_punctuation_symbols(char** cursor_start, char symbol)
 {
@@ -76,7 +95,12 @@ Type determine_figure(char** cursor_start, char** cursor_end)
     }
 }
 
-ErrStatus parse_circle(char** cursor_start, char** cursor_end, int* counter)
+ErrStatus parse_circle(
+        char** cursor_start,
+        char** cursor_end,
+        int* counter,
+        Circle* Circles,
+        int* num)
 {
     ErrStatus implementation2;
     float x1, y1, radius1;
@@ -117,17 +141,29 @@ ErrStatus parse_circle(char** cursor_start, char** cursor_end, int* counter)
     implementation2 = check_extra_token(cursor_start);
     if (implementation2)
         return FAILURE;
+    Circles[*counter].x1 = x1;
+    Circles[*counter].y1 = y1;
+    Circles[*counter].radius1 = radius1;
+    (*num)++;
+    printf("%d Тип фигуры: circle\n", *num);
+    printf("x1 = %.1lf y1 = %.1lf \nradius1 = %.1lf\n \n",
+           Circles[*counter].x1,
+           Circles[*counter].y1,
+           Circles[*counter].radius1);
     (*counter)++;
-    printf("%d Тип фигуры: circle\n", *counter);
-    printf("x1 = %.1lf y1 = %.1lf \nradius1 = %.1lf\n \n", x1, y1, radius1);
     return SUCCESS;
 }
 
-ErrStatus parse_triangle(char** cursor_start, char** cursor_end, int* counter)
+ErrStatus parse_triangle(
+        char** cursor_start,
+        char** cursor_end,
+        int* counter,
+        Triangle* Triangles,
+        int* num)
 {
     ErrStatus implementation2;
     float coords[8];
-    int number = 0;
+    int digit = 0;
 
     implementation2 = check_punctuation_symbols(cursor_start, '(');
     if (implementation2)
@@ -142,10 +178,10 @@ ErrStatus parse_triangle(char** cursor_start, char** cursor_end, int* counter)
         char letter = 'y';
         if (i % 2 == 0) {
             letter = 'x';
-            number++;
+            digit++;
         }
         if (*cursor_start == *cursor_end) {
-            printf("Error: expected float %c%d\n\n", letter, number);
+            printf("Error: expected float %c%d\n\n", letter, digit);
             return FAILURE;
         }
         *cursor_start = *cursor_end;
@@ -167,18 +203,28 @@ ErrStatus parse_triangle(char** cursor_start, char** cursor_end, int* counter)
     implementation2 = check_extra_token(cursor_start);
     if (implementation2)
         return FAILURE;
-    (*counter)++;
-    printf("%d Тип фигуры: triangle\n", *counter);
+    Triangles[*counter].x1 = coords[0];
+    Triangles[*counter].y1 = coords[1];
+    Triangles[*counter].x2 = coords[2];
+    Triangles[*counter].y2 = coords[3];
+    Triangles[*counter].x3 = coords[4];
+    Triangles[*counter].y3 = coords[5];
+    Triangles[*counter].x4 = coords[6];
+    Triangles[*counter].y4 = coords[7];
+    (*num)++;
+    printf("%d Тип фигуры: triangle\n", *num);
     printf("x1 = %.1lf y1 = %.1lf\nx2 = %.1lf y2 = %.1lf\nx3 = %.1lf "
            "y3 = %.1lf\nx4 = %.1lf y4 = %.1lf\n\n",
-           coords[0],
-           coords[1],
-           coords[2],
-           coords[3],
-           coords[4],
-           coords[5],
-           coords[6],
-           coords[7]);
+           Triangles[*counter].x1,
+           Triangles[*counter].y1,
+           Triangles[*counter].x2,
+           Triangles[*counter].y2,
+           Triangles[*counter].x3,
+           Triangles[*counter].y3,
+           Triangles[*counter].x4,
+           Triangles[*counter].y4);
+    (*counter)++;
+
     return SUCCESS;
 }
 
@@ -188,10 +234,19 @@ int main()
     char* cursor_start;
     char* cursor_end;
     Type figure;
-    int counter = 0;
+    int counter_c = 0;
+    int counter_t = 0;
+    int figure_num = 0;
+    int max_figure_value = 10;
+    Circle Circles[max_figure_value];
+    Triangle Triangles[max_figure_value];
 
     printf("Напишите то, что хотите проанализировать:\n");
     while ((fgets(input, 70, stdin))) {
+        if (counter_c + counter_t == max_figure_value) {
+            printf("The number of figures is exceeded. Maximum: 10\n");
+            break;
+        }
         figure = UNKNOWN;
         fputs(input, stdout); // если надо вывести введенные данные
         cursor_start = input;
@@ -204,15 +259,26 @@ int main()
 
         switch (figure) {
         case CIRCLE:
-            parse_circle(&cursor_start, &cursor_end, &counter);
+            parse_circle(
+                    &cursor_start,
+                    &cursor_end,
+                    &counter_c,
+                    Circles,
+                    &figure_num);
             break;
         case TRIANGLE:
-            parse_triangle(&cursor_start, &cursor_end, &counter);
+            parse_triangle(
+                    &cursor_start,
+                    &cursor_end,
+                    &counter_t,
+                    Triangles,
+                    &figure_num);
             break;
         case UNKNOWN:
             printf("Error: expected \"circle\" | \"triangle\"\n\n");
             break;
         }
     }
+    printf("%d  circles   %d  triangles\n", counter_c, counter_t);
     return 0;
 }

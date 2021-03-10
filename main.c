@@ -7,7 +7,7 @@ enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
 
 typedef enum TypesOfFigures { UNKNOWN, CIRCLE, TRIANGLE } Type;
 
-typedef enum ErrorStatus { SUCCESS = 0, FAILURE = -1 } Bool;
+typedef enum ErrorStatus { SUCCESS = 0, FAILURE = -1 } ErrStatus;
 
 void skip_space(char** cursor_start)
 {
@@ -18,7 +18,7 @@ void skip_space(char** cursor_start)
 
 // typedef struct
 
-Bool check_punctuation_symbols(char** cursor_start, char symbol)
+ErrStatus check_punctuation_symbols(char** cursor_start, char symbol)
 {
     if (**cursor_start == symbol) {
         (*cursor_start)++;
@@ -29,7 +29,16 @@ Bool check_punctuation_symbols(char** cursor_start, char symbol)
     }
 }
 
-Bool check_extra_token(char** cursor_start)
+ErrStatus check_left_brackets(Type figure, char** cursor_start)
+{
+    ErrStatus implementation = check_punctuation_symbols(cursor_start, '(');
+    if (figure == TRIANGLE && implementation == SUCCESS) {
+        implementation = check_punctuation_symbols(cursor_start, '(');
+    }
+    return implementation;
+}
+
+ErrStatus check_extra_token(char** cursor_start)
 {
     while (**cursor_start != '\0') {
         if ((isalnum(**cursor_start) != 0) || (ispunct(**cursor_start) != 0)) {
@@ -79,9 +88,9 @@ Type determine_figure(
     }
 }
 
-Bool parse_circle(char** cursor_start, char** cursor_end, int* counter)
+ErrStatus parse_circle(char** cursor_start, char** cursor_end, int* counter)
 {
-    Bool implementation2;
+    ErrStatus implementation2;
     float x1, y1, radius1;
 
     x1 = strtof(*cursor_start, cursor_end);
@@ -127,11 +136,10 @@ int main()
     char input[70];
     char* cursor_start;
     char* cursor_end;
-    // size_t length_of_type = 0;
     char type_circle[] = {"circle"};
     char type_triangle[] = {"triangle"};
     Type figure;
-    Bool implementation;
+    ErrStatus implementation;
     int counter = 0;
     //для кейса треугольника:
     // float x2, y2, x3, y3, x4, y4 = 0;
@@ -153,13 +161,9 @@ int main()
 
         cursor_start = cursor_end;
         skip_space(&cursor_start);
-        implementation = check_punctuation_symbols(&cursor_start, '(');
-        if (figure == TRIANGLE && implementation == SUCCESS) {
-            implementation = check_punctuation_symbols(&cursor_start, '(');
-        }
-        if (implementation == FAILURE) {
+        implementation = check_left_brackets(figure, &cursor_start);
+        if (implementation)
             continue;
-        }
 
         cursor_end = cursor_start;
         switch (figure) {

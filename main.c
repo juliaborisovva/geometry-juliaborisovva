@@ -131,6 +131,99 @@ ErrStatus parse_circle(char** cursor_start, char** cursor_end, int* counter)
     return SUCCESS;
 }
 
+ErrStatus parse_triangle(char** cursor_start, char** cursor_end, int* counter)
+{
+    ErrStatus implementation2;
+    float x1, y1, x2, y2, x3, y3, x4, y4;
+
+    x1 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float x1\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    y1 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float y1\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    skip_space(cursor_start);
+    implementation2 = check_punctuation_symbols(cursor_start, ',');
+    if (implementation2)
+        return FAILURE;
+
+    x2 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float x2\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    y2 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float y2\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    skip_space(cursor_start);
+    implementation2 = check_punctuation_symbols(cursor_start, ',');
+    if (implementation2)
+        return FAILURE;
+
+    x3 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float x3\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    y3 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float y3\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    skip_space(cursor_start);
+    implementation2 = check_punctuation_symbols(cursor_start, ',');
+    if (implementation2)
+        return FAILURE;
+
+    x4 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float x4\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    y4 = strtof(*cursor_start, cursor_end);
+    if (*cursor_start == *cursor_end) {
+        printf("Error: expected float y4\n\n");
+        return FAILURE;
+    }
+    *cursor_start = *cursor_end;
+    skip_space(cursor_start);
+    implementation2 = check_punctuation_symbols(cursor_start, ')');
+    if (implementation2)
+        return FAILURE;
+    implementation2 = check_punctuation_symbols(cursor_start, ')');
+    if (implementation2)
+        return FAILURE;
+    implementation2 = check_extra_token(cursor_start);
+    if (implementation2)
+        return FAILURE;
+    (*counter)++;
+    printf("%d Тип фигуры: triangle\n", *counter);
+    printf("x1 = %.1lf y1 = %.1lf\nx2 = %.1lf y2 = %.1lf\nx3 = %.1lf "
+           "y3 = %.1lf\nx4 = %.1lf y4 = %.1lf\n\n",
+           x1,
+           y1,
+           x2,
+           y2,
+           x3,
+           y3,
+           x4,
+           y4);
+    return SUCCESS;
+}
+
 int main()
 {
     char input[70];
@@ -170,105 +263,9 @@ int main()
         case CIRCLE:
             parse_circle(&cursor_start, &cursor_end, &counter);
             break;
-
         case TRIANGLE:
-            /*x1 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float x1\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            y1 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float y1\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            skip_space(&cursor_start);
-            check_punctuation_symbols(&cursor_start, &implementation, ',');
-            if (implementation == FAILURE) {
-                continue;
-            }
-
-            x2 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float x2\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            y2 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float y2\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            skip_space(&cursor_start);
-            check_punctuation_symbols(&cursor_start, &implementation, ',');
-            if (implementation == FAILURE) {
-                continue;
-            }
-
-            x3 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float x3\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            y3 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float y3\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            skip_space(&cursor_start);
-            check_punctuation_symbols(&cursor_start, &implementation, ',');
-            if (implementation == FAILURE) {
-                continue;
-            }
-
-            x4 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float x4\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            y4 = strtof(cursor_start, &cursor_end);
-            if (cursor_start == cursor_end) {
-                printf("Error: expected float y4\n\n");
-                continue;
-            }
-            cursor_start = cursor_end;
-            skip_space(&cursor_start);
-            check_punctuation_symbols(&cursor_start, &implementation, ')');
-            if (implementation == FAILURE) {
-                continue;
-            }
-            check_punctuation_symbols(&cursor_start, &implementation, ')');
-            if (implementation == FAILURE) {
-                continue;
-            }
-            check_extra_token(&cursor_start, &implementation);
-            if (implementation == FAILURE) {
-                continue;
-            }
-            //передать данные о переменных,
-            //типе фигуры, номере в массив
-            //посчитать номер фигуры, возможно потом не понадобиться тут,
-            //можно убрать (т.к. вывод будет после выполнения парсинга строки)
-            counter++;
-            printf("%d Тип фигуры: triangle\n", counter);
-            printf("x1 = %.1lf y1 = %.1lf\nx2 = %.1lf y2 = %.1lf\nx3 = %.1lf "
-                   "y3 = %.1lf\nx4 = %.1lf y4 = %.1lf\n\n",
-                   x1,
-                   y1,
-                   x2,
-                   y2,
-                   x3,
-                   y3,
-                   x4,
-                   y4);*/
+            parse_triangle(&cursor_start, &cursor_end, &counter);
             break;
-
         case UNKNOWN:
             break;
         }

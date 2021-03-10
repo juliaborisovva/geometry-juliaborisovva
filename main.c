@@ -29,15 +29,6 @@ ErrStatus check_punctuation_symbols(char** cursor_start, char symbol)
     }
 }
 
-ErrStatus check_left_brackets(Type figure, char** cursor_start)
-{
-    ErrStatus implementation = check_punctuation_symbols(cursor_start, '(');
-    if (figure == TRIANGLE && implementation == SUCCESS) {
-        implementation = check_punctuation_symbols(cursor_start, '(');
-    }
-    return implementation;
-}
-
 ErrStatus check_extra_token(char** cursor_start)
 {
     while (**cursor_start != '\0') {

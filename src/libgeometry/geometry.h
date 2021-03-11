@@ -1,6 +1,12 @@
 #pragma once
 #include <stdio.h>
 
+enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
+
+typedef enum TypesOfFigures { UNKNOWN, CIRCLE, TRIANGLE } Type;
+
+typedef enum ErrorStatus { SUCCESS = 0, FAILURE = -1 } ErrStatus;
+
 typedef struct TriangleData {
     float x1;
     float y1;
@@ -22,16 +28,10 @@ typedef struct CircleData {
     float area;
 } Circle;
 
-enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
+void skip_space(char** cursor_start);
 
-typedef enum TypesOfFigures { UNKNOWN, CIRCLE, TRIANGLE } Type;
+Type determine_figure (char** cursor_start, char** cursor_end);
 
-typedef enum ErrorStatus { SUCCESS = 0, FAILURE = -1 } ErrStatus;
+ErrStatus parse_circle(char **cursor_start, char **cursor_end, int* counter, Circle* Circles, int* num);
 
-void skip_space(char** cursor_start)
-
-Type determine_figure (char** cursor_start, char** cursor_end)
-
-ErrStatus parse_circle(char **cursor_start, char **cursor_end, int* counter, Circle* Circles, int* num)
-
-ErrStatus parse_triangle(char **cursor_start, char **cursor_end, int* counter, Triangle* Triangles, int* num)
+ErrStatus parse_triangle(char **cursor_start, char **cursor_end, int* counter, Triangle* Triangles, int* num);

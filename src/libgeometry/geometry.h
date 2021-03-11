@@ -30,8 +30,18 @@ typedef struct CircleData {
 
 void skip_space(char** cursor_start);
 
-Type determine_figure (char** cursor_start, char** cursor_end);
+Type determine_figure(char** cursor_start, char** cursor_end);
 
-ErrStatus parse_circle(char **cursor_start, char **cursor_end, int* counter, Circle* Circles, int* num);
+ErrStatus parse_circle(
+        char** cursor_start,
+        char** cursor_end,
+        int* counter,
+        Circle* Circles,
+        int* num);
 
-ErrStatus parse_triangle(char **cursor_start, char **cursor_end, int* counter, Triangle* Triangles, int* num);
+ErrStatus parse_triangle(
+        char** cursor_start,
+        char** cursor_end,
+        int* counter,
+        Triangle* Triangles,
+        int* num);

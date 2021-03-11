@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <libgeometry/geometry.h>
+#include <stdio.h>
 
 int main()
 {
@@ -31,15 +31,25 @@ int main()
         skip_space(&cursor_start);
 
         switch (figure) {
-            case CIRCLE:
-                parse_circle(&cursor_start, &cursor_end, &counter_c, Circles, &figure_num);
-                break;
-            case TRIANGLE:
-                parse_triangle(&cursor_start, &cursor_end, &counter_t, Triangles, &figure_num);
-                break;
-            case UNKNOWN:
-                printf("Error: expected \"circle\" | \"triangle\"\n\n");
-                break;
+        case CIRCLE:
+            parse_circle(
+                    &cursor_start,
+                    &cursor_end,
+                    &counter_c,
+                    Circles,
+                    &figure_num);
+            break;
+        case TRIANGLE:
+            parse_triangle(
+                    &cursor_start,
+                    &cursor_end,
+                    &counter_t,
+                    Triangles,
+                    &figure_num);
+            break;
+        case UNKNOWN:
+            printf("Error: expected \"circle\" | \"triangle\"\n\n");
+            break;
         }
     }
     printf("%d  circles   %d  triangles\n", counter_c, counter_t);

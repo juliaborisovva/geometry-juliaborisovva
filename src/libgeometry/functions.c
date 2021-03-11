@@ -230,6 +230,10 @@ ErrStatus parse_triangle(
     implementation2 = check_extra_token(cursor_start);
     if (implementation2)
         return FAILURE;
+    if ((coords[0] != coords[6]) && (coords[1] != coords[7])) {
+        printf("Error: point 1 and point 4 don't match\n\n");
+        return FAILURE;
+    }
     Triangles[*counter].x1 = coords[0];
     Triangles[*counter].y1 = coords[1];
     Triangles[*counter].x2 = coords[2];

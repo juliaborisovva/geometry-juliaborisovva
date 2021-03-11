@@ -1,5 +1,6 @@
 #include "geometry.h"
 #include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,6 +70,54 @@ Type determine_figure(char** cursor_start, char** cursor_end)
     }
 }
 
+static float circle_perimeter(Circle Circles)
+{
+    Circles.perimeter = 2 * M_PI * Circles.radius1;
+    return Circles.perimeter;
+}
+
+static float circle_area(Circle Circles)
+{
+    Circles.area = M_PI * pow(Circles.radius1, 2);
+    return Circles.area;
+}
+
+static void length_of_sides(Triangle Triangles, float* sides)
+{
+    sides[0]
+            = sqrt(pow((Triangles.x2 - Triangles.x1), 2)
+                   + pow((Triangles.y2 - Triangles.y1), 2));
+    sides[1]
+            = sqrt(pow((Triangles.x3 - Triangles.x2), 2)
+                   + pow((Triangles.y3 - Triangles.y2), 2));
+    sides[2]
+            = sqrt(pow((Triangles.x4 - Triangles.x3), 2)
+                   + pow((Triangles.y4 - Triangles.y3), 2));
+}
+
+static float triangle_perimeter(Triangle Triangles)
+{
+    int sides_value = 3;
+    float sides[sides_value];
+    length_of_sides(Triangles, sides);
+    float perimeter = 0;
+    for (int i = 0; i < 3; i++) {
+        perimeter += sides[i];
+    }
+    return perimeter;
+}
+
+static float triangle_area(Triangle Triangles)
+{
+    int sides_value = 3;
+    float sides[sides_value];
+    length_of_sides(Triangles, sides);
+    float perimeter = triangle_perimeter(Triangles);
+    float p = perimeter / 2.0;
+    float area = sqrt(p * (p - sides[0]) * (p - sides[1]) * (p - sides[2]));
+    return area;
+}
+
 ErrStatus parse_circle(
         char** cursor_start,
         char** cursor_end,
@@ -124,6 +173,10 @@ ErrStatus parse_circle(
            Circles[*counter].x1,
            Circles[*counter].y1,
            Circles[*counter].radius1);
+    Circles[*counter].perimeter = circle_perimeter(Circles[*counter]);
+    Circles[*counter].area = circle_area(Circles[*counter]);
+    printf("Perimeter = %.2lf\n", Circles[*counter].perimeter);
+    printf("Area = %.2lf\n\n", Circles[*counter].area);
     (*counter)++;
     return SUCCESS;
 }
@@ -197,6 +250,12 @@ ErrStatus parse_triangle(
            Triangles[*counter].y3,
            Triangles[*counter].x4,
            Triangles[*counter].y4);
+
+    Triangles[*counter].perimeter = triangle_perimeter(Triangles[*counter]);
+    Triangles[*counter].area = triangle_area(Triangles[*counter]);
+    printf("Perimeter = %.2lf\n", Triangles[*counter].perimeter);
+    printf("Area = %.2lf\n\n", Triangles[*counter].area);
+
     (*counter)++;
 
     return SUCCESS;

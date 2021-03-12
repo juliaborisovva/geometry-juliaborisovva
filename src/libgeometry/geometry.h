@@ -1,7 +1,4 @@
 #pragma once
-#include <stdio.h>
-
-enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
 
 typedef enum TypesOfFigures { UNKNOWN, CIRCLE, TRIANGLE } Type;
 

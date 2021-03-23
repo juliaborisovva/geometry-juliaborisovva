@@ -24,11 +24,9 @@ int main()
         fputs(input, stdout); // если надо вывести введенные данные
         cursor_start = input;
         cursor_end = input;
-
-        skip_space(&cursor_start);
+        
         figure = determine_figure(&cursor_start, &cursor_end);
         cursor_start = cursor_end;
-        skip_space(&cursor_start);
 
         switch (figure) {
         case CIRCLE:

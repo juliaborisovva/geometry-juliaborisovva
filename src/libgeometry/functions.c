@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
+enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
 
 void skip_space(char** cursor_start)
 {
@@ -45,6 +45,7 @@ static ErrStatus check_extra_token(char** cursor_start)
 двигаем указатель end пока не увидим другой символ*/
 static void select_type(char** cursor_start, char** cursor_end)
 {
+    skip_space(cursor_start);
     *cursor_end = *cursor_start;
     while (isalpha(**cursor_end) != 0) {
         (*cursor_end)++;
@@ -128,6 +129,7 @@ ErrStatus parse_circle(
     ErrStatus implementation2;
     float x1, y1, radius1;
 
+    skip_space(cursor_start);
     implementation2 = check_punctuation_symbols(cursor_start, '(');
     if (implementation2)
         return FAILURE;
@@ -192,6 +194,7 @@ ErrStatus parse_triangle(
     float coords[8];
     int digit = 0;
 
+    skip_space(cursor_start);
     implementation2 = check_punctuation_symbols(cursor_start, '(');
     if (implementation2)
         return FAILURE;

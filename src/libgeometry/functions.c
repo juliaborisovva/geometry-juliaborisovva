@@ -74,14 +74,12 @@ Type determine_figure(char** cursor_start, char** cursor_end)
 
 static float circle_perimeter(Circle circle)
 {
-    circle.perimeter = 2 * M_PI * circle.radius1;
-    return circle.perimeter;
+    return 2 * M_PI * circle.radius1;
 }
 
 static float circle_area(Circle circle)
 {
-    circle.area = M_PI * pow(circle.radius1, 2);
-    return circle.area;
+    return M_PI * pow(circle.radius1, 2);
 }
 
 static void length_of_sides(Triangle triangle, float* sides)

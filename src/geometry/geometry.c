@@ -11,8 +11,8 @@ int main()
     int counter_t = 0;
     int figure_num = 0;
     int max_figure_value = 10;
-    Circle Circles[max_figure_value];
-    Triangle Triangles[max_figure_value];
+    Circle circle[max_figure_value];
+    Triangle triangle[max_figure_value];
 
     printf("Напишите то, что хотите проанализировать:\n");
     while ((fgets(input, 70, stdin))) {
@@ -24,11 +24,9 @@ int main()
         fputs(input, stdout); // если надо вывести введенные данные
         cursor_start = input;
         cursor_end = input;
-
-        skip_space(&cursor_start);
+        
         figure = determine_figure(&cursor_start, &cursor_end);
         cursor_start = cursor_end;
-        skip_space(&cursor_start);
 
         switch (figure) {
         case CIRCLE:
@@ -36,7 +34,7 @@ int main()
                     &cursor_start,
                     &cursor_end,
                     &counter_c,
-                    Circles,
+                    circle,
                     &figure_num);
             break;
         case TRIANGLE:
@@ -44,11 +42,11 @@ int main()
                     &cursor_start,
                     &cursor_end,
                     &counter_t,
-                    Triangles,
+                    triangle,
                     &figure_num);
             break;
         case UNKNOWN:
-            printf("Error: expected \"circle\" | \"triangle\"\n\n");
+            printf("Error: expected \"Circle\" | \"Triangle\"\n\n");
             break;
         }
     }

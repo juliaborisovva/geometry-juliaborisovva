@@ -4,7 +4,7 @@ typedef enum TypesOfFigures { UNKNOWN, CIRCLE, TRIANGLE } Type;
 
 typedef enum ErrorStatus { SUCCESS = 0, FAILURE = -1 } ErrStatus;
 
-typedef struct TriangleData {
+typedef struct {
     float x1;
     float y1;
     float x2;
@@ -17,7 +17,7 @@ typedef struct TriangleData {
     float area;
 } Triangle;
 
-typedef struct CircleData {
+typedef struct {
     float x1;
     float y1;
     float radius1;
@@ -33,12 +33,12 @@ ErrStatus parse_circle(
         char** cursor_start,
         char** cursor_end,
         int* counter,
-        Circle* Circles,
+        Circle* circle,
         int* num);
 
 ErrStatus parse_triangle(
         char** cursor_start,
         char** cursor_end,
         int* counter,
-        Triangle* Triangles,
+        Triangle* triangle,
         int* num);

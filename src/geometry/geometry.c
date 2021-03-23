@@ -24,7 +24,7 @@ int main()
         fputs(input, stdout); // если надо вывести введенные данные
         cursor_start = input;
         cursor_end = input;
-        
+
         figure = determine_figure(&cursor_start, &cursor_end);
         cursor_start = cursor_end;
 

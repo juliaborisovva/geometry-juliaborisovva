@@ -25,8 +25,6 @@ typedef struct {
     float area;
 } Circle;
 
-void skip_space(char** cursor_start);
-
 Type determine_figure(char** cursor_start, char** cursor_end);
 
 ErrStatus parse_circle(

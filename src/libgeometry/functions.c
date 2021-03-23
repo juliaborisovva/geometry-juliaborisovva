@@ -7,7 +7,7 @@
 
 enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
 
-void skip_space(char** cursor_start)
+static void skip_space(char** cursor_start)
 {
     while (**cursor_start == ' ') {
         (*cursor_start)++;

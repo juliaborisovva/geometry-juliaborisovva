@@ -38,14 +38,14 @@ int main()
         }
     }
 
-    // поиск коллизий, магическое число
+    // поиск коллизий
     int collision[figure_counter][figure_counter - 1];
     for (int r = 0; r < figure_counter; r++) {
         for (int k = 0; k < (figure_counter - 1); k++) {
             collision[r][k] = 11;
         }
     }
-
+    find_collisions(shape, figure_counter, collision);
     printf("\n\n");
     for (int r = 0; r < figure_counter; r++) {
         for (int k = 0; k < (figure_counter - 1); k++) {
@@ -69,7 +69,6 @@ int main()
         } else if (shape[i].figure == TRIANGLE) {
             printf("%d triangle (( ", i + 1);
             for (int m = 0; m < 4; m++) {
-                // сделать х и у в массивах, а не как отдельные единицы++
                 printf("%.1lf %.1lf, ",
                        shape[i].data.triangle.x[m],
                        shape[i].data.triangle.y[m]);

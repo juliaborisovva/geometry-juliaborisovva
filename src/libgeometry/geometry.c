@@ -28,6 +28,64 @@ static CollStatus check_intersect_c(Shape shape1, Shape shape2)
     return DONTINTERSECT;
 }
 
+void find_collisions(
+        Shape* shape,
+        int figure_counter,
+        int collision[figure_counter][figure_counter - 1])
+{
+    int status;
+
+    for (int i = 0; i < figure_counter; i++) {
+        int cols = 0;
+        for (int m = 0; m < figure_counter; m++) {
+            if (m != i) {
+                if (shape[i].figure == CIRCLE && shape[m].figure == CIRCLE) {
+                    status = check_intersect_c(shape[i], shape[m]);
+                    if (status == INTERSECT) {
+                        collision[i][cols] = m;
+                        cols++;
+                    }
+                } else if (
+                        shape[i].figure == CIRCLE
+                        && shape[m].figure == TRIANGLE) {
+                    // что-то
+                    /*if (status == INTERSECT) {
+                        collision[i][cols] = m;
+                        cols++;
+                    }*/
+                } else if (
+                        shape[i].figure == TRIANGLE
+                        && shape[m].figure == CIRCLE) {
+                    // что-то
+                    /*if (status == INTERSECT) {
+                        collision[i][cols] = m;
+                        cols++;
+                    }*/
+                } else if (
+                        shape[i].figure == TRIANGLE
+                        && shape[m].figure == TRIANGLE) {
+                    // что-то
+                    /*if (status == INTERSECT) {
+                        collision[i][cols] = m;
+                        cols++;
+                    }*/
+                }
+            }
+        }
+    }
+};
+
+// FIX MEEEEEE пересечение треугольников
+/*for (int i = 0; i < counter_triangle; i++) {
+    for (int b = 0; b <= 3; i++) {
+        for (int k = 0; k <= 2; k++) {
+            check_triangle_intersection(triangle.x1, triangle.y1
+        }
+    }
+}
+printf("\n\n");
+}*/
+
 static void skip_space(char** cursor_start)
 {
     while (**cursor_start == ' ') {

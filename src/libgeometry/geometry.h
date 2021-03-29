@@ -27,6 +27,11 @@ typedef struct {
     } data;
 } Shape;
 
+void find_collisions(
+        Shape* shape,
+        int figure_counter,
+        int collision[figure_counter][figure_counter - 1]);
+
 Type determine_figure(char** cursor_start, char** cursor_end);
 
 ErrStatus parse_circle(

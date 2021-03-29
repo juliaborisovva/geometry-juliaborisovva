@@ -1,5 +1,6 @@
 #include <libgeometry/geometry.h>
 #include <stdio.h>
+#define EMPTY 11
 
 int main()
 {
@@ -42,7 +43,7 @@ int main()
     int collision[figure_counter][figure_counter - 1];
     for (int r = 0; r < figure_counter; r++) {
         for (int k = 0; k < (figure_counter - 1); k++) {
-            collision[r][k] = 11;
+            collision[r][k] = EMPTY;
         }
     }
     find_collisions(shape, figure_counter, collision);
@@ -79,10 +80,9 @@ int main()
         }
         printf("\nIntersects with:\n");
 
-        //пересечение и исправить магическое число 11
-
+        //пересечение
         for (int d = 0; d < (figure_counter - 1); d++) {
-            if (collision[i][d] != 11) {
+            if (collision[i][d] != EMPTY) {
                 if (shape[collision[i][d]].figure == CIRCLE) {
                     printf("  • circle %d\n", collision[i][d] + 1);
                 }

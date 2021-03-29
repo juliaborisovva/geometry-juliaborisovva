@@ -7,9 +7,25 @@
 
 enum LengthsOfFigures { LENGTH_OF_CIRCLE = 6, LENGTH_OF_TRIANGLE = 8 };
 
+typedef enum CollisionStatus { INTERSECT = 0, DONTINTERSECT = -1 } CollStatus;
+
 static float calculate_length(float x2, float x1, float y2, float y1)
 {
     return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2));
+}
+
+static CollStatus check_intersect_c(Shape shape1, Shape shape2)
+{
+    float sum_radius = shape1.data.circle.radius1 + shape2.data.circle.radius1;
+    float d = calculate_length(
+            shape2.data.circle.x1,
+            shape1.data.circle.x1,
+            shape2.data.circle.y1,
+            shape1.data.circle.y1);
+    if (d <= sum_radius) {
+        return INTERSECT;
+    }
+    return DONTINTERSECT;
 }
 
 static void skip_space(char** cursor_start)

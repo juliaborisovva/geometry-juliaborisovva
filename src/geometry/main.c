@@ -45,7 +45,7 @@ int main()
             collision[r][k] = 11;
         }
     }
-    
+
     printf("\n\n");
     for (int r = 0; r < figure_counter; r++) {
         for (int k = 0; k < (figure_counter - 1); k++) {

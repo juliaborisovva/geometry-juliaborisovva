@@ -28,6 +28,99 @@ static CollStatus check_intersect_c(Shape shape1, Shape shape2)
     return DONTINTERSECT;
 }
 
+// Пересекаются ли 2 отрезка?
+static float find_vector_product(float ax, float ay, float bx, float by)
+{ // ax,ay — координаты a bx,by — координаты b
+    return ax * by - bx * ay;
+}
+
+static CollStatus find_lines_cross(
+        float x1,
+        float y1,
+        float x2,
+        float y2,
+        float x3,
+        float y3,
+        float x4,
+        float y4)
+{ // Пересекаются ли отрезки?
+    float v[4];
+    v[0] = find_vector_product(x4 - x3, y4 - y3, x1 - x3, y1 - y3);
+    v[1] = find_vector_product(x4 - x3, y4 - y3, x2 - x3, y2 - y3);
+    v[2] = find_vector_product(x2 - x1, y2 - y1, x3 - x1, y3 - y1);
+    v[3] = find_vector_product(x2 - x1, y2 - y1, x4 - x1, y4 - y1);
+    if ((v[0] * v[1] <= 0)
+        && (v[2] * v[3] <= 0)) { // {v1v2<0 и v3v4<0, отрезки пересекаются}
+        return INTERSECT;
+    } else {
+        return DONTINTERSECT;
+    }
+}
+
+static CollStatus find_shape_inside(
+        float x1,
+        float y1,
+        float x2,
+        float y2,
+        float x3,
+        float y3,
+        float x0,
+        float y0)
+{
+    float v1, v2, v3;
+    v1 = find_vector_product((x1 - x0), (y1 - y0), (x2 - x1), (y2 - y1));
+    v2 = find_vector_product((x2 - x0), (y2 - y0), (x3 - x2), (y3 - y2));
+    v3 = find_vector_product((x3 - x0), (y3 - y0), (x1 - x3), (y1 - y3));
+    if (((v1 > 0) && (v2 > 0) && (v3 > 0))
+        || ((v1 < 0) && (v2 < 0) && (v3 < 0))) {
+        return INTERSECT;
+    }
+    return DONTINTERSECT;
+}
+
+// FIX MEEEEEE пересечение треугольников
+static CollStatus check_intersect_t(Shape shape1, Shape shape2)
+{
+    CollStatus status[2] = {DONTINTERSECT, DONTINTERSECT};
+    for (int i = 0; i < 3; i++) {
+        for (int k = 0; k < 2; k++) {
+            status[k] = find_lines_cross(
+                    shape1.data.triangle.x[i],
+                    shape1.data.triangle.y[i],
+                    shape1.data.triangle.x[i + 1],
+                    shape1.data.triangle.y[i + 1],
+                    shape2.data.triangle.x[k],
+                    shape2.data.triangle.y[k],
+                    shape2.data.triangle.x[k + 1],
+                    shape2.data.triangle.y[k + 1]);
+        }
+        if (status[0] == INTERSECT || status[1] == INTERSECT) {
+            return INTERSECT;
+        }
+    }
+    Shape choice1 = shape1;
+    Shape choice2 = shape2;
+    for (int k = 0; k < 2; k++) {
+        if (k == 1) {
+            choice1 = shape2;
+            choice2 = shape1;
+        }
+        status[k] = find_shape_inside(
+                choice1.data.triangle.x[0],
+                choice1.data.triangle.y[0],
+                choice1.data.triangle.x[1],
+                choice1.data.triangle.y[1],
+                choice1.data.triangle.x[2],
+                choice1.data.triangle.y[2],
+                choice2.data.triangle.x[0],
+                choice2.data.triangle.y[0]);
+    }
+    if (status[0] == INTERSECT || status[1] == INTERSECT) {
+        return INTERSECT;
+    }
+    return DONTINTERSECT;
+};
+
 void find_collisions(
         Shape* shape,
         int figure_counter,
@@ -64,27 +157,16 @@ void find_collisions(
                 } else if (
                         shape[i].figure == TRIANGLE
                         && shape[m].figure == TRIANGLE) {
-                    // что-то
-                    /*if (status == INTERSECT) {
+                    status = check_intersect_t(shape[i], shape[m]);
+                    if (status == INTERSECT) {
                         collision[i][cols] = m;
                         cols++;
-                    }*/
+                    }
                 }
             }
         }
     }
 };
-
-// FIX MEEEEEE пересечение треугольников
-/*for (int i = 0; i < counter_triangle; i++) {
-    for (int b = 0; b <= 3; i++) {
-        for (int k = 0; k <= 2; k++) {
-            check_triangle_intersection(triangle.x1, triangle.y1
-        }
-    }
-}
-printf("\n\n");
-}*/
 
 static void skip_space(char** cursor_start)
 {

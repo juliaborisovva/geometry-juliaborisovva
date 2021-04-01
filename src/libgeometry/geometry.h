@@ -2,7 +2,24 @@
 
 typedef enum TypesOfFigures { UNKNOWN, CIRCLE, TRIANGLE } Type;
 
-typedef enum ErrorStatus { SUCCESS = 0, FAILURE = -1 } ErrStatus;
+typedef enum ErrorStatus {
+    SUCCESS = 0,
+    FAILURE = -1,
+    LBRACKET = -2,
+    X1 = -3,
+    Y1 = -4,
+    X2 = -5,
+    Y2 = -6,
+    X3 = -7,
+    Y3 = -8,
+    X4 = -9,
+    Y4 = -10,
+    COMMA = -11,
+    RADIUS1 = -12,
+    RBRACKET = -13,
+    EXTRATOKEN = -14,
+    DONTMATCH = -15
+} ErrStatus;
 
 typedef struct {
     float x[4];

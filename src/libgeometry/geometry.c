@@ -1,7 +1,7 @@
 #include "geometry.h"
 #include <ctype.h>
 #include <math.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -177,21 +177,6 @@ find_distance(float x1, float x2, float y1, float y2, float x0, float y0)
 
 static CollStatus check_intersect_c_t(Shape circle, Shape triangle)
 {
-    // 1 расстояние от центра до одной из вершин <= radius
-    /*float center_to_vertex[3];
-    for (int i = 0; i < 3; i++) {
-        center_to_vertex[i] = calculate_length(
-                triangle.data.triangle.x[i],
-                circle.data.circle.x1,
-                triangle.data.triangle.y[i],
-                circle.data.circle.y1);
-        if (center_to_vertex[i] <= circle.data.circle.radius1) {
-            return INTERSECT;
-        }
-    }*/
-    // нормаль к прямой Ах + Ву = 0
-    // вектор с координатами (-B, A)
-    //
     // 2 расстояние от центра окружности до одной из 3 прямых <= radius
     // проверить принадлежит ли ближайшая точка отрезку
     for (int i = 0; i < 3; i++) {
@@ -296,7 +281,6 @@ static ErrStatus check_punctuation_symbols(char** cursor_start, char symbol)
         (*cursor_start)++;
         return SUCCESS;
     } else {
-        printf("Error: expected \"%c\"\n\n", symbol);
         return FAILURE;
     }
 }
@@ -305,9 +289,6 @@ static ErrStatus check_extra_token(char** cursor_start)
 {
     while (**cursor_start != '\0') {
         if ((isalnum(**cursor_start) != 0) || (ispunct(**cursor_start) != 0)) {
-            printf("Error: expected "
-                   "nothing after "
-                   "data string\n\n");
             **cursor_start = '\0';
             return FAILURE;
         } else {
@@ -371,38 +352,35 @@ ErrStatus parse_circle(
     skip_space(cursor_start);
     implementation2 = check_punctuation_symbols(cursor_start, '(');
     if (implementation2)
-        return FAILURE;
+        return LBRACKET;
     *cursor_end = *cursor_start;
     x1 = strtof(*cursor_start, cursor_end);
     if (*cursor_start == *cursor_end) {
-        printf("Error: expected float x1\n\n");
-        return FAILURE;
+        return X1;
     }
     *cursor_start = *cursor_end;
     y1 = strtof(*cursor_start, cursor_end);
     if (*cursor_start == *cursor_end) {
-        printf("Error: expected float y1\n\n");
-        return FAILURE;
+        return Y1;
     }
     *cursor_start = *cursor_end;
     skip_space(cursor_start);
     implementation2 = check_punctuation_symbols(cursor_start, ',');
     if (implementation2)
-        return FAILURE;
+        return COMMA;
 
     radius1 = strtof(*cursor_start, cursor_end);
     if (*cursor_start == *cursor_end) {
-        printf("Error: expected float radius\n\n");
-        return FAILURE;
+        return RADIUS1;
     }
     *cursor_start = *cursor_end;
     skip_space(cursor_start);
     implementation2 = check_punctuation_symbols(cursor_start, ')');
     if (implementation2)
-        return FAILURE;
+        return RBRACKET;
     implementation2 = check_extra_token(cursor_start);
     if (implementation2)
-        return FAILURE;
+        return EXTRATOKEN;
     shape[*figure_counter].figure = CIRCLE;
     shape[*figure_counter].data.circle.x1 = x1;
     shape[*figure_counter].data.circle.y1 = y1;
@@ -430,10 +408,10 @@ ErrStatus parse_triangle(
     skip_space(cursor_start);
     implementation2 = check_punctuation_symbols(cursor_start, '(');
     if (implementation2)
-        return FAILURE;
+        return LBRACKET;
     implementation2 = check_punctuation_symbols(cursor_start, '(');
     if (implementation2)
-        return FAILURE;
+        return LBRACKET;
     *cursor_end = *cursor_start;
 
     for (int i = 0; i < 8; i++) {
@@ -444,8 +422,30 @@ ErrStatus parse_triangle(
             digit++;
         }
         if (*cursor_start == *cursor_end) {
-            printf("Error: expected float %c%d\n\n", letter, digit);
-            return FAILURE;
+            if (letter == 'x') {
+                switch (digit) {
+                case 1:
+                    return X1;
+                case 2:
+                    return X2;
+                case 3:
+                    return X3;
+                case 4:
+                    return X4;
+                }
+            }
+            if (letter == 'y') {
+                switch (digit) {
+                case 1:
+                    return Y1;
+                case 2:
+                    return Y2;
+                case 3:
+                    return Y3;
+                case 4:
+                    return Y4;
+                }
+            }
         }
         *cursor_start = *cursor_end;
 
@@ -453,22 +453,21 @@ ErrStatus parse_triangle(
             skip_space(cursor_start);
             implementation2 = check_punctuation_symbols(cursor_start, ',');
             if (implementation2)
-                return FAILURE;
+                return COMMA;
         }
     }
     skip_space(cursor_start);
     implementation2 = check_punctuation_symbols(cursor_start, ')');
     if (implementation2)
-        return FAILURE;
+        return RBRACKET;
     implementation2 = check_punctuation_symbols(cursor_start, ')');
     if (implementation2)
-        return FAILURE;
+        return RBRACKET;
     implementation2 = check_extra_token(cursor_start);
     if (implementation2)
-        return FAILURE;
+        return EXTRATOKEN;
     if ((coords[0] != coords[6]) && (coords[1] != coords[7])) {
-        printf("Error: point 1 and point 4 don't match\n\n");
-        return FAILURE;
+        return DONTMATCH;
     }
 
     shape[*figure_counter].figure = TRIANGLE;

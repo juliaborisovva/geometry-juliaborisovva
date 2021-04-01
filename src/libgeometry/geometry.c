@@ -14,6 +14,42 @@ static float calculate_length(float x2, float x1, float y2, float y1)
     return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2));
 }
 
+static void calculate_length_of_sides(Shape shape, float* side)
+{
+    int b = 0;
+    for (int i = 0; i < 3; i++) {
+        side[i] = calculate_length(
+                shape.data.triangle.x[b + 1],
+                shape.data.triangle.x[b],
+                shape.data.triangle.y[b + 1],
+                shape.data.triangle.y[b]);
+        b += 1;
+    }
+}
+
+static float triangle_perimeter(Shape shape)
+{
+    int sides_value = 3;
+    float side[sides_value];
+    calculate_length_of_sides(shape, side);
+    float perimeter = 0;
+    for (int i = 0; i < sides_value; i++) {
+        perimeter += side[i];
+    }
+    return perimeter;
+}
+
+static float triangle_area(Shape shape)
+{
+    int sides_value = 3;
+    float side[sides_value];
+    calculate_length_of_sides(shape, side);
+    float perimeter = triangle_perimeter(shape);
+    float p = perimeter / 2.0;
+    float area = sqrt(p * (p - side[0]) * (p - side[1]) * (p - side[2]));
+    return area;
+}
+
 static CollStatus check_intersect_c(Shape shape1, Shape shape2)
 {
     float sum_radius = shape1.data.circle.radius1 + shape2.data.circle.radius1;
@@ -121,6 +157,85 @@ static CollStatus check_intersect_t(Shape shape1, Shape shape2)
     return DONTINTERSECT;
 };
 
+static float
+find_distance(float x1, float x2, float y1, float y2, float x0, float y0)
+{
+    float side_length = calculate_length(x2, x1, y2, y1);
+    Shape triangle;
+
+    float coords[8] = {x0, y0, x1, y1, x2, y2, x0, y0};
+    int b = 0;
+    for (int d = 0; d < 4; d++) {
+        triangle.data.triangle.x[d] = coords[b];
+        b++;
+        triangle.data.triangle.y[d] = coords[b];
+        b++;
+    }
+    float area = triangle_area(triangle);
+    return (2.0 * area) / side_length;
+};
+
+static CollStatus check_intersect_c_t(Shape circle, Shape triangle)
+{
+    // 1 расстояние от центра до одной из вершин <= radius
+    /*float center_to_vertex[3];
+    for (int i = 0; i < 3; i++) {
+        center_to_vertex[i] = calculate_length(
+                triangle.data.triangle.x[i],
+                circle.data.circle.x1,
+                triangle.data.triangle.y[i],
+                circle.data.circle.y1);
+        if (center_to_vertex[i] <= circle.data.circle.radius1) {
+            return INTERSECT;
+        }
+    }*/
+    // нормаль к прямой Ах + Ву = 0
+    // вектор с координатами (-B, A)
+    //
+    // 2 расстояние от центра окружности до одной из 3 прямых <= radius
+    // проверить принадлежит ли ближайшая точка отрезку
+    for (int i = 0; i < 3; i++) {
+        float distance = find_distance(
+                triangle.data.triangle.x[i],
+                triangle.data.triangle.x[i + 1],
+                triangle.data.triangle.y[i],
+                triangle.data.triangle.y[i + 1],
+                circle.data.circle.x1,
+                circle.data.circle.y1);
+        if (distance <= circle.data.circle.radius1) {
+            float circle_start
+                    = circle.data.circle.x1 - circle.data.circle.radius1;
+            float circle_end
+                    = circle.data.circle.x1 + circle.data.circle.radius1;
+            float line_start, line_end;
+            if (triangle.data.triangle.x[i] < triangle.data.triangle.x[i + 1]) {
+                line_start = triangle.data.triangle.x[i];
+                line_end = triangle.data.triangle.x[i + 1];
+            } else {
+                line_start = triangle.data.triangle.x[i + 1];
+                line_end = triangle.data.triangle.x[i];
+            }
+            if ((circle_start <= line_end) && (circle_end >= line_start)) {
+                return INTERSECT;
+            }
+        }
+    }
+    // 3 центр окружности лежит внутри треугольника
+    CollStatus status = find_shape_inside(
+            triangle.data.triangle.x[0],
+            triangle.data.triangle.y[0],
+            triangle.data.triangle.x[1],
+            triangle.data.triangle.y[1],
+            triangle.data.triangle.x[2],
+            triangle.data.triangle.y[2],
+            circle.data.circle.x1,
+            circle.data.circle.y1);
+    if (status == INTERSECT) {
+        return INTERSECT;
+    }
+    return DONTINTERSECT;
+}
+
 void find_collisions(
         Shape* shape,
         int figure_counter,
@@ -141,19 +256,19 @@ void find_collisions(
                 } else if (
                         shape[i].figure == CIRCLE
                         && shape[m].figure == TRIANGLE) {
-                    // что-то
-                    /*if (status == INTERSECT) {
+                    status = check_intersect_c_t(shape[i], shape[m]);
+                    if (status == INTERSECT) {
                         collision[i][cols] = m;
                         cols++;
-                    }*/
+                    }
                 } else if (
                         shape[i].figure == TRIANGLE
                         && shape[m].figure == CIRCLE) {
-                    // что-то
-                    /*if (status == INTERSECT) {
+                    status = check_intersect_c_t(shape[m], shape[i]);
+                    if (status == INTERSECT) {
                         collision[i][cols] = m;
                         cols++;
-                    }*/
+                    }
                 } else if (
                         shape[i].figure == TRIANGLE
                         && shape[m].figure == TRIANGLE) {
@@ -242,42 +357,6 @@ static float circle_perimeter(Shape shape)
 static float circle_area(Shape shape)
 {
     return M_PI * pow(shape.data.circle.radius1, 2);
-}
-
-static void calculate_length_of_sides(Shape shape, float* side)
-{
-    int b = 0;
-    for (int i = 0; i < 3; i++) {
-        side[i] = calculate_length(
-                shape.data.triangle.x[b + 1],
-                shape.data.triangle.x[b + 0],
-                shape.data.triangle.y[b + 1],
-                shape.data.triangle.y[b + 0]);
-        b += 1;
-    }
-}
-
-static float triangle_perimeter(Shape shape)
-{
-    int sides_value = 3;
-    float side[sides_value];
-    calculate_length_of_sides(shape, side);
-    float perimeter = 0;
-    for (int i = 0; i < sides_value; i++) {
-        perimeter += side[i];
-    }
-    return perimeter;
-}
-
-static float triangle_area(Shape shape)
-{
-    int sides_value = 3;
-    float side[sides_value];
-    calculate_length_of_sides(shape, side);
-    float perimeter = triangle_perimeter(shape);
-    float p = perimeter / 2.0;
-    float area = sqrt(p * (p - side[0]) * (p - side[1]) * (p - side[2]));
-    return area;
 }
 
 ErrStatus parse_circle(

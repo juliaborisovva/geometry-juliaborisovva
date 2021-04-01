@@ -37,22 +37,22 @@ all: $(APP_PATH)
 -include $(DEPS)
 
 $(APP_PATH): $(APP_OBJECTS) $(LIB_PATH)
-        $(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 $(LIB_PATH): $(LIB_OBJECTS)
-        ar rcs $@ $^
+	ar rcs $@ $^
 
 $(OBJ_DIR)/$(SRC_DIR)/$(APP_NAME)/%.o: $(SRC_DIR)/$(APP_NAME)/%.c
-        $(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@ $(LDLIBS)
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@ $(LDLIBS)
 
 $(OBJ_DIR)/$(SRC_DIR)/$(LIB_NAME)/%.o: $(SRC_DIR)/$(LIB_NAME)/%.c
-        $(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@ $(LDLIBS)
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@ $(LDLIBS)
 
 .PHONY: clean
 clean:
-        $(RM) $(APP_PATH) $(LIB_PATH) $(APP_PATH_TEST)
-        find $(OBJ_DIR) -name '*.o' -exec $(RM) '{}' \;
-        find $(OBJ_DIR) -name '*.d' -exec $(RM) '{}' \;
+	$(RM) $(APP_PATH) $(LIB_PATH) $(APP_PATH_TEST)
+	find $(OBJ_DIR) -name '*.o' -exec $(RM) '{}' \;
+	find $(OBJ_DIR) -name '*.d' -exec $(RM) '{}' \;
 
 .PHONY: test
 test: $(APP_PATH_TEST)
